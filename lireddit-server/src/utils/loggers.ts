@@ -1,8 +1,8 @@
 export const loggerIsConnected = (isConnected: boolean): void => {
     if (isConnected) {
-        console.log(`CONNECTED `.bgWhite.black + `               TRUE`.yellow)
+        console.log(`DB CONNECTED `.bgWhite.black + `            TRUE`.yellow)
     } else {
-        console.log(`CONNECTED `.bgWhite.black + `               FALSE`.red)
+        console.log(`DB CONNECTED `.bgWhite.black + `            FALSE`.red)
     }
 }
 
