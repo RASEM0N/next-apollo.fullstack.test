@@ -28,4 +28,6 @@ yarn.lock
 TODO.txt
 package-lock.json
 
-text.txt
+help.txt
+
+/lireddit-server/.env
