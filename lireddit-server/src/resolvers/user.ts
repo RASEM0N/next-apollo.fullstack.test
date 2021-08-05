@@ -4,7 +4,7 @@ import { MyContext } from '../../types'
 import argon2 from 'argon2'
 
 @InputType()
-class UserCreateInput {
+class UserInput {
     @Field(() => String)
     username: string
 
@@ -14,19 +14,22 @@ class UserCreateInput {
 
 // болванка
 @ObjectType()
-class UserCreateOutput {
+class UserOutput {
     @Field(() => Boolean)
     success: boolean
 
     @Field(() => String, { nullable: true })
-    message: string
+    token?: string
+
+    @Field(() => String, { nullable: true })
+    error?: string
 }
 
 @Resolver()
 export class UserResolver {
     @Mutation(() => User)
-    async userCreate(
-        @Arg('input') { username, password }: UserCreateInput,
+    async userRegister(
+        @Arg('input') { username, password }: UserInput,
         @Ctx() { em }: MyContext,
     ): Promise<User> {
         const hashedPassword = await argon2.hash(password)
@@ -36,6 +39,28 @@ export class UserResolver {
         })
 
         await em.persistAndFlush(user)
+        return user
+    }
+
+    @Mutation(() => User, { nullable: true })
+    async userLogin(
+        @Arg('input') { username, password }: UserInput,
+        @Ctx() { em }: MyContext,
+    ): Promise<User | null> {
+        const user = await em.findOne(User, {
+            username,
+        })
+
+        if (!user) {
+            return null
+        }
+
+        const isValid = await argon2.verify(user.password, password)
+
+        if (!isValid) {
+            return null
+        }
+
         return user
     }
 }
