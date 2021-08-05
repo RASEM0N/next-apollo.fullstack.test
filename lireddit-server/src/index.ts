@@ -8,15 +8,13 @@ dotenv.config({
 
 import { ApolloServer } from 'apollo-server-express'
 import { MikroORM } from '@mikro-orm/core'
-import {
-    ApolloServerPluginLandingPageGraphQLPlayground,
-} from 'apollo-server-core'
+import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core'
 import microConfig from './mikro-orm.config'
-import { loggerIsConnected, loggerServerStarted } from '-utils/loggers'
+import { loggerIsConnected, loggerServerStarted } from './utils/loggers'
 import { buildSchema } from 'type-graphql'
-import { HelloResolver } from '-resolvers/hello'
+import { HelloResolver } from './resolvers/hello'
 import { __prod__ } from './constants'
-import { PostResolver } from '-resolvers/post'
+import { PostResolver } from './resolvers/post'
 
 const main = async () => {
     const orm = await MikroORM.init(microConfig)
@@ -29,8 +27,11 @@ const main = async () => {
         introspection: !__prod__,
         plugins: [ApolloServerPluginLandingPageGraphQLPlayground()],
         schema: await buildSchema({
-            resolvers: [HelloResolver],
-            validate: true,
+            resolvers: [HelloResolver, PostResolver],
+            validate: false,
+        }),
+        context: (_ctx) => ({
+            em: orm.em,
         }),
     })
     await apolloServer.start()
@@ -49,5 +50,5 @@ const main = async () => {
 }
 
 main().catch((e) => {
-    console.error(e)
+    console.error(`${e.message}`.underline.red)
 })
