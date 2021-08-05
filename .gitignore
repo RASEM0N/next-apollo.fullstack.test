@@ -29,5 +29,7 @@ TODO.txt
 package-lock.json
 
 help.txt
-
+*/dist
+#*/migrations
+lireddit-server/src/migrations
 /lireddit-server/.env

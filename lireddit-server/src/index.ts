@@ -1,22 +1,29 @@
 import dotenv from 'dotenv'
+import express from 'express'
+import 'colors'
 
 dotenv.config({
     path: '.env',
 })
 import { MikroORM } from '@mikro-orm/core'
-import { Post } from './entities/Post'
 import microConfig from './mikro-orm.config'
+import { loggerIsConnected, loggerServerStarted } from './utils/loggers'
 
 const main = async () => {
     const orm = await MikroORM.init(microConfig)
-    console.log(`CONNECTED --${await orm.isConnected()}--`)
     await orm.getMigrator().up()
+    loggerIsConnected(await orm.isConnected())
 
-    // const post = orm.em.create(Post, { title: 'my first post' })
-    // await orm.em.persistAndFlush(post)
+    const app = express()
+    const PORT = process.env.PORT || 4001
+    const server = app.listen(PORT, () => {
+        loggerServerStarted(PORT)
+    })
 
-    const posts = await orm.em.find(Post, {})
-    console.log(posts)
+    process.on('unhandledRejection', (reason, _) => {
+        console.log(`Error: ${reason}`.red)
+        server.close(() => process.exit(1))
+    })
 }
 
 main().catch((e) => {
