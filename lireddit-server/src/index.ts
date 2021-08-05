@@ -8,6 +8,9 @@ dotenv.config({
 
 import { ApolloServer } from 'apollo-server-express'
 import { MikroORM } from '@mikro-orm/core'
+import {
+    ApolloServerPluginLandingPageGraphQLPlayground,
+} from 'apollo-server-core'
 import microConfig from './mikro-orm.config'
 import { loggerIsConnected, loggerServerStarted } from '-utils/loggers'
 import { buildSchema } from 'type-graphql'
@@ -24,9 +27,10 @@ const main = async () => {
 
     const apolloServer = new ApolloServer({
         introspection: !__prod__,
+        plugins: [ApolloServerPluginLandingPageGraphQLPlayground()],
         schema: await buildSchema({
             resolvers: [HelloResolver],
-            validate: false,
+            validate: true,
         }),
     })
     await apolloServer.start()
