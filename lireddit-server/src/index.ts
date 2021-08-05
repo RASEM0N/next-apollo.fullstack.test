@@ -31,7 +31,7 @@ const main = async () => {
             validate: false,
         }),
         context: (_ctx) => ({
-            em: orm.em,
+            em: orm.em, // прокидываем в @Ctx ресольверов
         }),
     })
     await apolloServer.start()
