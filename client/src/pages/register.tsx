@@ -5,6 +5,7 @@ import { Box, Button } from '@chakra-ui/core'
 import { InputField } from 'components/InputField'
 import { Wrapper } from '../components/Wrapper'
 import { useMutation } from 'urql'
+import { useRegisterMutation } from '../generated/graphql'
 
 interface RegisterPageProps {}
 
@@ -23,7 +24,7 @@ const REGISTER_MUTATION = `
 `
 
 const Register: NextPage<RegisterPageProps> = ({}) => {
-    const [, register] = useMutation(REGISTER_MUTATION)
+    const [, register] = useRegisterMutation()
     return (
         <Wrapper variant="small">
             <Formik
