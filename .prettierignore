@@ -12,6 +12,6 @@ yarn.lock
 
 .next
 */dist
-*/migrations
-next-env.d.ts
+**/migrations
+*.d.ts
 README.md
