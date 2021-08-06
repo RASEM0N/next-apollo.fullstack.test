@@ -13,3 +13,5 @@ yarn.lock
 .next
 */dist
 */migrations
+next-env.d.ts
+README.md
