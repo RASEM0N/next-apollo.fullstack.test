@@ -33,3 +33,4 @@ help.txt
 #*/migrations
 lireddit-server/src/migrations
 /lireddit-server/.env
+*.rdb

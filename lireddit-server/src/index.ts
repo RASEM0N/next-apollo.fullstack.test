@@ -17,12 +17,38 @@ import { __prod__ } from './constants'
 import { PostResolver } from './resolvers/post'
 import { UserResolver } from './resolvers/user'
 
+import redis from 'redis'
+import session from 'express-session'
+import connectRedis from 'connect-redis'
+import { MyContext } from '../types'
+
 const main = async () => {
     const orm = await MikroORM.init(microConfig)
     await orm.getMigrator().up()
     loggerIsConnected(await orm.isConnected())
 
     const app = express()
+    const RedisStore = connectRedis(session)
+    const redisClient = redis.createClient()
+
+    app.use(
+        session({
+            name: 'qid',
+            store: new RedisStore({
+                client: redisClient,
+                disableTouch: false,
+            }),
+            cookie: {
+                maxAge: 1000 * 60 * 3, // 3min
+                httpOnly: true,
+                sameSite: 'lax', // csrf
+                secure: __prod__, // cookie only works in https
+            },
+            saveUninitialized: false,
+            secret: process.env.SESSION_SECRET as string,
+            resave: false,
+        }),
+    )
 
     const apolloServer = new ApolloServer({
         introspection: !__prod__,
@@ -31,7 +57,9 @@ const main = async () => {
             resolvers: [HelloResolver, PostResolver, UserResolver],
             validate: false,
         }),
-        context: (_ctx) => ({
+        context: ({ req, res }): MyContext => ({
+            req,
+            res,
             em: orm.em, // прокидываем в @Ctx ресольверов
         }),
     })
