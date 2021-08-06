@@ -6,6 +6,7 @@ import { InputField } from 'components/InputField'
 import { Wrapper } from '../components/Wrapper'
 import { useMutation } from 'urql'
 import { useRegisterMutation } from '../generated/graphql'
+import { useRouter } from 'next/router'
 
 interface RegisterPageProps {}
 
@@ -24,14 +25,23 @@ const REGISTER_MUTATION = `
 `
 
 const Register: NextPage<RegisterPageProps> = ({}) => {
+    const router = useRouter()
     const [, register] = useRegisterMutation()
+
     return (
         <Wrapper variant="small">
             <Formik
                 initialValues={{ username: '', password: '' }}
                 onSubmit={async (values) => {
                     const response = await register(values)
-                    console.log(response)
+
+                    if (response.data?.userRegister) {
+                        return router.push('/')
+                    }
+
+                    if (response.error) {
+                        alert(`Ошибка регистрации`)
+                    }
                 }}
             >
                 {({ isSubmitting }) => (
