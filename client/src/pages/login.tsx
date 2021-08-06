@@ -1,54 +1,34 @@
 import React from 'react'
-import { NextPage } from 'next'
-import { Form, Formik, useFormik } from 'formik'
-import { Box, Button, Text } from '@chakra-ui/core'
-import { InputField } from 'components/InputField'
+import { Formik, Form } from 'formik'
+import { Box, Button } from '@chakra-ui/core'
 import { Wrapper } from '../components/Wrapper'
-import { useMutation } from 'urql'
-import { useRegisterMutation } from '../generated/graphql'
+import { InputField } from '../components/InputField'
+import { useLoginMutation } from '../generated/graphql'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
 
-interface RegisterPageProps {}
-
-const REGISTER_MUTATION = `
-    mutation createNewUser($username:String!, $password:String!){
-        userRegister(input: {
-                username: $username,
-                password: $password
-        }) {
-            id
-            username
-            createdAt
-            updatedAt        
-        }
-    }
-`
-
-const Register: NextPage<RegisterPageProps> = ({}) => {
+const Login: React.FC<{}> = ({}) => {
     const router = useRouter()
-    const [, register] = useRegisterMutation()
-
+    const [, login] = useLoginMutation()
     return (
         <Wrapper variant="small">
             <Head>
-                <title>Register</title>
+                <title>Login</title>
             </Head>
             <Formik
                 initialValues={{ username: '', password: '' }}
                 onSubmit={async (values, { setErrors }) => {
-                    const response = await register(values)
-
-                    if (response.data?.userRegister) {
+                    const response = await login({
+                        input: values,
+                    })
+                    if (response.data?.userLogin) {
                         return router.push('/')
-                    }
-
-                    if (response.error) {
+                    } else {
                         setErrors({
                             password: 'Invalid field',
                             username: 'Invalid field',
                         })
-                        alert(`Ошибка регистрации`)
+                        alert(`Ошибка авторизации`)
                     }
                 }}
             >
@@ -64,7 +44,7 @@ const Register: NextPage<RegisterPageProps> = ({}) => {
                             />
                         </Box>
                         <Button mt={4} type="submit" isLoading={isSubmitting} variantColor="teal">
-                            register
+                            login
                         </Button>
                     </Form>
                 )}
@@ -73,4 +53,4 @@ const Register: NextPage<RegisterPageProps> = ({}) => {
     )
 }
 
-export default Register
+export default Login
