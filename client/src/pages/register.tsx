@@ -8,6 +8,8 @@ import { useMutation } from 'urql'
 import { useRegisterMutation } from '../generated/graphql'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
+import { withUrqlClient } from 'next-urql'
+import { createUrqlClient } from '../utils'
 
 interface RegisterPageProps {}
 
@@ -73,4 +75,4 @@ const Register: NextPage<RegisterPageProps> = ({}) => {
     )
 }
 
-export default Register
+export default withUrqlClient(createUrqlClient)(Register)
