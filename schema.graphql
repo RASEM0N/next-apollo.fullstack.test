@@ -22,7 +22,6 @@ type Post {
 }
 
 type Query {
-    hello: String!
     postGetAll: [Post!]!
     postGetById(id: ID!): Post
     userMe: User

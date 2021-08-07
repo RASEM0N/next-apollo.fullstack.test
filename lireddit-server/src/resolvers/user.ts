@@ -2,7 +2,6 @@ import { Arg, Ctx, Field, InputType, Mutation, ObjectType, Query, Resolver } fro
 import { User } from '../entities/User'
 import { MyContext } from '../../types'
 import argon2 from 'argon2'
-import { validate } from 'class-validator'
 import { COOKIE_NAME } from '../constants'
 
 @InputType()
@@ -30,14 +29,12 @@ class UserOutput {
 @Resolver()
 export class UserResolver {
     @Query(() => User, { nullable: true })
-    async userMe(@Ctx() { em, req }: MyContext): Promise<User | null> {
+    async userMe(@Ctx() { req }: MyContext): Promise<User | null> {
         if (!req.session.userId) {
             return null
         }
 
-        const user = await em.findOne(User, {
-            id: req.session.userId,
-        })
+        const user = await User.findOne(req.session.userId)
 
         if (!user) {
             return null
@@ -49,19 +46,16 @@ export class UserResolver {
     @Mutation(() => User)
     async userRegister(
         @Arg('input', () => UserInput) { username, password }: UserInput,
-        @Ctx() { em, req }: MyContext,
+        @Ctx() { req }: MyContext,
     ): Promise<User> {
         const hashedPassword = await argon2.hash(password)
-        const user = await em.create(User, {
+        const user = await User.create({
             username: username,
             password: hashedPassword,
         })
 
-        await em.persistAndFlush(user)
+        await user.save()
 
-        // store user id session
-        // this will set a cookie on the user
-        // keep them logged in
         req.session.userId = user.id
 
         return user
@@ -70,17 +64,18 @@ export class UserResolver {
     @Mutation(() => User, { nullable: true })
     async userLogin(
         @Arg('input', () => UserInput) { username, password }: UserInput,
-        @Ctx() { em, req }: MyContext,
+        @Ctx() { req }: MyContext,
     ): Promise<User | null> {
-        const user = await em.findOne(User, {
-            username,
+        const user = await User.findOne({
+            where: {
+                username,
+            },
         })
 
         if (!user) {
             return null
         }
-        // валидация class-validator, input не работает
-        // await validate(user).then(e => console.log(e))
+
         const isValid = await argon2.verify(user.password, password)
 
         if (!isValid) {

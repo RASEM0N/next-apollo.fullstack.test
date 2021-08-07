@@ -5,28 +5,39 @@ import 'colors'
 dotenv.config({
     path: '.env',
 })
-
 import { ApolloServer } from 'apollo-server-express'
-import { MikroORM } from '@mikro-orm/core'
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core'
-import microConfig from './mikro-orm.config'
 import { loggerIsConnected, loggerServerStarted } from './utils/loggers'
 import { buildSchema } from 'type-graphql'
-import { HelloResolver } from './resolvers/hello'
+// import { HelloResolver } from './resolvers/hello'
+
 import { __prod__, COOKIE_NAME } from './constants'
 import { PostResolver } from './resolvers/post'
 import { UserResolver } from './resolvers/user'
 
 import cors from 'cors'
 import redis from 'redis'
+
 import session from 'express-session'
 import connectRedis from 'connect-redis'
 import { MyContext } from '../types'
+import { createConnection } from 'typeorm'
+import { Post } from './entities/Post'
+import { User } from './entities/User'
 
 const main = async () => {
-    const orm = await MikroORM.init(microConfig)
-    await orm.getMigrator().up()
-    loggerIsConnected(await orm.isConnected())
+    const connect = await createConnection({
+        type: 'postgres',
+        database: process.env.DB_NAME,
+        username: process.env.DB_USER_NAME,
+        password: process.env.DB_USER_PASSWORD,
+        logging: true,
+        synchronize: true,
+        entities: [Post, User],
+        host: process.env.DB_HOST,
+        port: !isNaN(Number(process.env.DB_PORT)) ? Number(process.env.DB_PORT) : 5432,
+    })
+    loggerIsConnected(connect.isConnected)
 
     const app = express()
     const RedisStore = connectRedis(session)
@@ -62,13 +73,16 @@ const main = async () => {
         introspection: !__prod__,
         plugins: [ApolloServerPluginLandingPageGraphQLPlayground()],
         schema: await buildSchema({
-            resolvers: [HelloResolver, PostResolver, UserResolver],
+            resolvers: [
+                // HelloResolver,
+                PostResolver,
+                UserResolver,
+            ],
             validate: false,
         }),
         context: ({ req, res }): MyContext => ({
             req,
             res,
-            em: orm.em, // прокидываем в @Ctx ресольверов
         }),
     })
     await apolloServer.start()
