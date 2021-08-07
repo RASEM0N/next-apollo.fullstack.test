@@ -1,16 +1,18 @@
 import React from 'react'
 import { Box, Link, Flex, Button } from '@chakra-ui/core'
 import NextLink from 'next/link'
-import { useLogoutMutation, useMeQuery } from '../generated/graphql'
+import { MeDocument, MeQuery, useLogoutMutation, useMeQuery } from '../generated/graphql'
 import { isServer } from '../utils'
+import { useApolloClient } from '@apollo/client'
 
 interface NavBarProps {}
 
 export const NavBar: React.FC<NavBarProps> = ({}) => {
-    const [{ data, fetching }] = useMeQuery({
-        pause: isServer(),
+    const { data, loading: fetching } = useMeQuery({
+        skip: isServer(),
     })
-    const [{ fetching: fetchingLogout }, logout] = useLogoutMutation()
+    const apolloClient = useApolloClient()
+    const [logout, { loading: fetchingLogout }] = useLogoutMutation()
     let body = null
 
     // data is loading
@@ -33,8 +35,35 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
             <Flex>
                 <Box mr={2}>{data.userMe.username}</Box>
                 <Button
-                    onClick={() => {
-                        logout()
+                    onClick={async () => {
+                        await logout({
+                            update: (cache, { data, errors }) => {
+                                // но так в кэше останется user
+                                // cache.writeQuery({
+                                //     query: MeDocument,
+                                //     data: {
+                                //         userMe: null,
+                                //     },
+                                // })
+
+                                // нахоодим нашего пользователя
+                                // или просто взять у data (из useMeQuery)
+                                const { userMe }: MeQuery = cache.readQuery({
+                                    query: MeDocument,
+                                })
+
+                                // удаляем из кэша пользователя
+                                cache.evict({
+                                    id: cache.identify(userMe),
+                                })
+                            },
+                        })
+
+                        // после resetStore заного
+                        // запускаются query (которые нужны странице)
+
+                        // работает асинхронно по этому
+                        // await apolloClient.resetStore()
                     }}
                     isLoading={fetchingLogout}
                     variant="link"
