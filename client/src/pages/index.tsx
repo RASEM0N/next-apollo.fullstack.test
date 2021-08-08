@@ -1,7 +1,8 @@
 import { NextPage } from 'next'
 import { NavBar } from '../components/Navbar'
 import { PostsQuery, usePostsQuery } from '../generated/graphql'
-import { NetworkStatus } from '@apollo/client'
+import { NetworkStatus, useReactiveVar } from '@apollo/client'
+import { isAuthVar } from '../apollo'
 
 // https://www.apollographql.com/docs/react/api/react/hooks/#usequery
 const Index: NextPage = () => {
@@ -15,12 +16,25 @@ const Index: NextPage = () => {
         })
     }
 
+    // можно использовать useQuery
+    // но тогда придется писать документ
+    // query isAuthorized {
+    //         isAuth @client
+    //     }
+
+    // а можно просто так, но уже
+    // через реактивную переменую
+    // и нам просто надо где-то меняеть ее
+
+    const isAuth = useReactiveVar(isAuthVar)
+    console.log(isAuth ? 'авторизован' : 'не авторизован')
+
     // if (networkStatus === NetworkStatus.error) ....
     return (
         <>
             <NavBar />
             <div>Hello world</div>
-            {data && data.postGetAll.map((p) => <div>{p.title}</div>)}
+            {data && data.postGetAll.map((p) => <div key={p.id}>{p.title}</div>)}
         </>
     )
 }
