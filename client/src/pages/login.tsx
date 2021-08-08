@@ -16,24 +16,6 @@ const Login: React.FC<{}> = ({}) => {
             variables: {
                 input: values,
             },
-            // updateQueries,
-            // https://www.apollographql.com/docs/react/caching/cache-interaction/#using-graphql-queries
-            // если использовать writeFragments то все с использованием одного и того же фрагмента
-            // обновятся
-            update: (cache, { data, errors }, _) => {
-                // if (data.userLogin) {
-                //     cache.writeQuery({
-                //         query: MeDocument,
-                //         data: { userMe: data.userLogin },
-                //     })
-                // }
-                // cache.writeFragment({
-                //     fragment: RegularUserFragmentDoc,
-                //     data: {
-                //         ...data.userLogin
-                //     }
-                // })
-            },
         })
     }
 

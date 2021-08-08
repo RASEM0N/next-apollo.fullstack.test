@@ -8,24 +8,10 @@ const Index: NextPage = () => {
     // https://www.apollographql.com/docs/react/api/react/hooks/#usequery
     const { data, loading, error, fetchMore, networkStatus } = usePostsQuery({
         notifyOnNetworkStatusChange: true,
-        ssr: true,
     })
     const fetchPosts = async () => {
-        // updateQuery для пагинации
-        // по сути дела к старым данным, добавляем новые
         await fetchMore({
             variables: {},
-            // Функция, которая позволяет обновить кэшированный результат запроса без выполнения последующей
-            updateQuery: (previousQueryResult, { fetchMoreResult }) => {
-                if (!fetchMoreResult) {
-                    return previousQueryResult
-                }
-
-                return {
-                    __typename: 'Query',
-                    postGetAll: [...previousQueryResult.postGetAll, ...fetchMoreResult.postGetAll],
-                }
-            },
         })
     }
 
