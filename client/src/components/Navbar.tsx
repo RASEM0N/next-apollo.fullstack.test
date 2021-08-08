@@ -25,7 +25,7 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
         isAuthLoadingVar(fetching)
     }, [fetching])
 
-    console.log(networkStatus)
+    // console.log(networkStatus)
 
     // data is loading
     if (fetching) {
