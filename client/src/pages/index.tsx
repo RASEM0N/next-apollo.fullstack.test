@@ -1,7 +1,14 @@
 import { NextPage } from 'next'
 import { NavBar } from '../components/Navbar'
 import { PostsQuery, usePostsQuery } from '../generated/graphql'
-import { gql, NetworkStatus, useMutation, useQuery, useReactiveVar } from '@apollo/client'
+import {
+    gql,
+    NetworkStatus,
+    useApolloClient,
+    useMutation,
+    useQuery,
+    useReactiveVar,
+} from '@apollo/client'
 import { isAuthVar } from '../apollo'
 
 // https://www.apollographql.com/docs/react/api/react/hooks/#usequery
@@ -23,11 +30,7 @@ const Index: NextPage = () => {
         },
     )
 
-    const [deletePost, {}] = useMutation(gql`
-        mutation MutationA {
-            kavo @client
-        }
-    `)
+    const client = useApolloClient()
     const fetchPosts = async () => {
         await fetchMore({
             variables: {},
@@ -69,20 +72,12 @@ const Index: NextPage = () => {
                                 marginLeft: 40,
                             }}
                             onClick={() => {
-                                deletePost({
-                                    variables: {
-                                        id: p.id,
-                                    },
-                                    update: (cache, _, { variables }) => {
-                                        // одно и тоже
-                                        console.log(`Post:${variables.id}`)
-                                        console.log(cache.identify(p))
-
-                                        cache.evict({
-                                            id: `Post:${variables.id}`,
-                                            broadcast: true,
-                                        })
-                                    },
+                                // одно и тоже
+                                console.log(`Post:${p.id}`)
+                                console.log(client.cache.identify(p))
+                                client.cache.evict({
+                                    id: `Post:${p.id}`,
+                                    broadcast: true,
                                 })
                             }}
                         >
