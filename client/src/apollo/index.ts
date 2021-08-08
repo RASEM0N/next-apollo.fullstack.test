@@ -1,5 +1,6 @@
 import { ApolloClient, gql, InMemoryCache, makeVar } from '@apollo/client'
 import { MeDocument, MeQuery } from '../generated/graphql'
+import { withApollo as createWithApollo } from 'next-apollo'
 
 export const isAuthVar = makeVar<boolean>(false)
 export const isAuthLoadingVar = makeVar<boolean>(false)
@@ -92,3 +93,4 @@ export const createClient = (ctx?: any) => {
 }
 
 export const client = createClient()
+export const withApollo = createWithApollo(client)

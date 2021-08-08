@@ -8,7 +8,7 @@ import { useRouter } from 'next/router'
 import Head from 'next/head'
 import { NavBar } from '../components/Navbar'
 import { useReactiveVar } from '@apollo/client'
-import { isAuthLoadingVar, isAuthVar } from '../apollo'
+import { isAuthLoadingVar, isAuthVar, withApollo } from '../apollo'
 
 const Login: React.FC<{}> = ({}) => {
     const router = useRouter()
@@ -88,4 +88,4 @@ const Login: React.FC<{}> = ({}) => {
     )
 }
 
-export default Login
+export default withApollo({ ssr: false })(Login)

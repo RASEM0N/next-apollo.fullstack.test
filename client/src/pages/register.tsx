@@ -7,6 +7,7 @@ import { Wrapper } from '../components/Wrapper'
 import { useRegisterMutation } from '../generated/graphql'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
+import { withApollo } from 'apollo'
 
 interface RegisterPageProps {}
 
@@ -60,4 +61,4 @@ const Register: NextPage<RegisterPageProps> = ({}) => {
     )
 }
 
-export default Register
+export default withApollo({ ssr: false })(Register)

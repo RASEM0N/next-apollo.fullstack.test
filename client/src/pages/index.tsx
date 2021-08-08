@@ -9,10 +9,11 @@ import {
     useQuery,
     useReactiveVar,
 } from '@apollo/client'
-import { isAuthVar } from '../apollo'
+import { isAuthVar, withApollo } from '../apollo'
+import Login from './login'
 
 // https://www.apollographql.com/docs/react/api/react/hooks/#usequery
-const Index: NextPage = () => {
+const Index = () => {
     // https://www.apollographql.com/docs/react/api/react/hooks/#usequery
     const { data, loading, error, fetchMore, networkStatus } = usePostsQuery({
         notifyOnNetworkStatusChange: true,
@@ -89,4 +90,4 @@ const Index: NextPage = () => {
     )
 }
 // ssr true - usePostQuery на сервере
-export default Index
+export default withApollo({ ssr: true })(Index)
