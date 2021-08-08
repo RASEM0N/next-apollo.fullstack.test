@@ -1,4 +1,4 @@
-import { ApolloClient, InMemoryCache, makeVar } from '@apollo/client'
+import { ApolloClient, gql, InMemoryCache, makeVar } from '@apollo/client'
 import { MeDocument, MeQuery } from '../generated/graphql'
 
 export const isAuthVar = makeVar<boolean>(false)
@@ -26,6 +26,12 @@ export const cache = new InMemoryCache({
                             isAuthVar(false)
                         }
                         return existing
+                    },
+                },
+                getNumber: {
+                    read(_, { variables }) {
+                        // console.log(variables)
+                        return 1488
                     },
                 },
             },
@@ -67,10 +73,21 @@ export const cache = new InMemoryCache({
 
 export const createClient = (ctx?: any) => {
     return new ApolloClient({
+        cache,
         connectToDevTools: true,
         uri: 'http://localhost:5000/graphql',
-        cache,
         credentials: 'include',
+        typeDefs: gql`
+            extend type Query {
+                getNumber(ban: String): Int!
+            }
+
+            #            Хз почему не работает
+            #            но Query работает все
+            extend type Mutation {
+                kavo: Int
+            }
+        `,
     })
 }
 
