@@ -1,0 +1,5 @@
+query Me {
+    userMe{
+        ...regularUser
+    }
+}

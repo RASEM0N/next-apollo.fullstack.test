@@ -1,0 +1,15 @@
+{
+  "scripts": {
+    "dev:server": "npm run dev --prefix ./lireddit-server",
+    "dev:client": "npm run dev --prefix ./client",
+    "dev": "concurrently \"redis-server\" \"yarn dev:server\" \"yarn dev:client\"",
+    "prettier:server": "prettier --write ./lireddit-server/src/**/*.ts",
+    "prettier:client": "prettier --write ./client/src/**/*.tsx"
+  },
+  "dependencies": {
+    "prettier": "^2.3.2"
+  },
+  "devDependencies": {
+    "concurrently": "^6.2.0"
+  }
+}
