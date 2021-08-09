@@ -7,7 +7,7 @@ import { MeDocument, RegularUserFragmentDoc, useLoginMutation } from '../generat
 import { useRouter } from 'next/router'
 import Head from 'next/head'
 import { NavBar } from '../components/Navbar'
-import { useReactiveVar } from '@apollo/client'
+import { useApolloClient, useReactiveVar } from '@apollo/client'
 import { isAuthLoadingVar, isAuthVar, withApollo } from '../apollo'
 
 const Login: React.FC<{}> = ({}) => {
