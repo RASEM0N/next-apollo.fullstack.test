@@ -14,6 +14,7 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
         loading: fetching,
         networkStatus,
     } = useMeQuery({
+        ssr: false,
         skip: isServer(),
         notifyOnNetworkStatusChange: true,
     })
